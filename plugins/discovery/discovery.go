@@ -113,21 +113,10 @@ func New(manager *plugins.Manager, opts ...func(*Discovery)) (*Discovery, error)
 
 	result.config = config
 	restClient := manager.Client(config.service)
-	if strings.ToLower(restClient.Config().Type) == "oci" {
-		ociStorePath := filepath.Join(os.TempDir(), "opa", "oci") // use temporary folder /tmp/opa/oci
-		if manager.Config.PersistenceDirectory != nil {
-			ociStorePath = filepath.Join(*manager.Config.PersistenceDirectory, "oci")
-		}
-		result.downloader = download.NewOCI(config.Config, restClient, config.path, ociStorePath).
-			WithCallback(result.oneShot).
-			WithBundleVerificationConfig(config.Signing).
-			WithBundlePersistence(config.Persist)
-	} else {
-		result.downloader = download.New(config.Config, restClient, config.path).
-			WithCallback(result.oneShot).
-			WithBundleVerificationConfig(config.Signing).
-			WithBundlePersistence(config.Persist)
-	}
+	result.downloader = download.New(config.Config, restClient, config.path).
+		WithCallback(result.oneShot).
+		WithBundleVerificationConfig(config.Signing).
+		WithBundlePersistence(config.Persist)
 	result.status = &bundle.Status{
 		Name: Name,
 	}
